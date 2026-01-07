@@ -12,6 +12,11 @@ if not BOT_TOKEN or not YOUTUBE_API_KEY:
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
+# اختبار أن السيرفر يعمل (GET)
+@app.route("/", methods=["GET"])
+def test():
+    return "BOT IS ALIVE", 200
+
 @bot.message_handler(commands=['start'])
 def start(msg):
     bot.reply_to(msg, "🎬 أرسل اسم الفيديو للبحث في يوتيوب")
@@ -19,6 +24,7 @@ def start(msg):
 @bot.message_handler(func=lambda m: True)
 def search(msg):
     q = msg.text
+
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         "part": "snippet",
@@ -37,6 +43,7 @@ def search(msg):
     vid = r["items"][0]["id"]["videoId"]
     bot.reply_to(msg, f"https://youtu.be/{vid}")
 
+# Webhook من Telegram (POST)
 @app.route("/", methods=["POST"])
 def webhook():
     update = telebot.types.Update.de_json(request.json)
